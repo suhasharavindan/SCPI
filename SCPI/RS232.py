@@ -11,7 +11,7 @@ def read_ports():
     """Find ports to serial connections by assuming USB connection.
 
     Returns:
-        list str: Instrunent ports.
+        list str: Instrument ports.
     """
     ports = []
     for comport in serial.tools.list_ports.comports():
@@ -71,7 +71,7 @@ def read_instruments(conf, instruments, sleep_time=0, meas_time=10000, val_range
         for ins in instruments:
             ins.set_CONF(conf, val_range, val_res, channels)
 
-    time.sleep(2)
+    time.sleep(10)
     output = []
 
     # Start time
@@ -122,7 +122,7 @@ class RS232:
 
         time.sleep(0.5)
         if self.ser.is_open:
-            self.ser.write("SYSTem:REMote\n".encode())
+            self.ser.write("SYST:REM\n".encode())
 
 
     def __del__(self):
