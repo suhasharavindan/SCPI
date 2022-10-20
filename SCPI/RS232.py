@@ -84,13 +84,17 @@ def read_instruments(conf, instruments, sleep_time=0, meas_time=10000, val_range
             toc = time.time()
             measurements = []
             for ins in instruments:
-                measurements.append(ins.read_meas())
+                val = ins.read_meas()
+                if isinstance(val, list):
+                    measurements.extend(val)
+                else:
+                    measurements.append(val)
 
             vals = [(toc-tic)] + measurements
             print(*vals, sep='\t')
             output.append(vals)
 
-            # A pause is required between reads
+            # A pause between reads
             time.sleep(sleep_time)
 
         return np.array(output)
@@ -120,10 +124,9 @@ class RS232:
                                  bytesize = bytesize,
                                  xonxoff = xonxoff)
 
-        time.sleep(0.5)
+        time.sleep(5)
         if self.ser.is_open:
             self.ser.write("SYST:REM\n".encode())
-
 
     def __del__(self):
         """Close serial port upon object delection."""
@@ -176,16 +179,14 @@ class RS232:
         """Take a measurement.
 
         Returns:
-            float: Measurement.
+            float or string: Measurement.
         """
         try:
             self.ser.write("READ?\n".encode())
             temp = self.ser.readline()
-            output = float(temp[:-2])
+            output = float(temp.decode()[:-2])
         except ValueError:
-            print(temp)
-            temp = self.ser.readline()
-            output = float(temp[:-2])
+            output = temp.decode()[:-2]
 
         return output
 
@@ -239,10 +240,26 @@ class MX34970A(RS232):
         Args:
             conf (str): Measurement mode.
             channels (list int): Channel indices.
-            val_range (int): Approximate range of measurement in standard units.
+            val_range (int or list): Approximate range of measurement in standard units.
             val_res (float): Measurement resolution in standard units.
         """
 
-        channel_str = ",".join(str(ch) for ch in channels)
-        params = f"{val_range}, {val_res}, (@{channel_str})"
-        super().set_CONFIG(conf, params)
+        if isinstance(val_range, list):
+            for idx, ch in enumerate(channels):
+                params = f"{val_range[idx]}, {val_res}, (@{ch})"
+                super().set_CONFIG(conf, params)
+        else:
+            channel_str = ",".join(str(ch) for ch in channels)
+            params = f"{val_range}, {val_res}, (@{channel_str})"
+            super().set_CONFIG(conf, params)
+
+    def read_meas(self):
+        """Read measurement.
+
+        Returns:
+            list float: Parsed measurement read response.
+        """
+        ret = super().read_meas()
+        if isinstance(ret, str):
+            res = [float(val) for val in ret.split(',')]
+        return res
