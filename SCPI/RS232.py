@@ -262,4 +262,6 @@ class MX34970A(RS232):
         ret = super().read_meas()
         if isinstance(ret, str):
             res = [float(val) for val in ret.split(',')]
+        else:
+            res = ret
         return res
