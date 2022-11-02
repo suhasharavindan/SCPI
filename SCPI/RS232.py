@@ -3,7 +3,6 @@
 @description: RS232 SCPI communication object, instruments and helper functions.
 """
 import time
-import numpy as np
 import serial
 import serial.tools.list_ports
 
@@ -43,10 +42,11 @@ def init_instruments(instrument_type):
 
     return instruments
 
-def read_instruments(conf, instruments, sleep_time=0, meas_time=10000, val_range=1, val_res=1e-6, channels=None):
+def read_instruments(filename, conf, instruments, sleep_time=0, meas_time=10000, val_range=1, val_res=1e-6, channels=None):
     """Take specified measurement from multiple DMMs at every period for a set amount of time.
 
     Args:
+        filename (str): Output file name.
         conf (str): Measurement mode. Look at set_CONF function for options.
         instruments (list): Instrument objects.
         sleepTime (float, optional): Sleep time between measurements in sec. Defaults to 0.
@@ -72,7 +72,6 @@ def read_instruments(conf, instruments, sleep_time=0, meas_time=10000, val_range
             ins.set_CONF(conf, val_range, val_res, channels)
 
     time.sleep(10)
-    output = []
 
     # Start time
     tic = time.time()
@@ -92,16 +91,17 @@ def read_instruments(conf, instruments, sleep_time=0, meas_time=10000, val_range
 
             vals = [(toc-tic)] + measurements
             print(*vals, sep='\t')
-            output.append(vals)
+
+            # Stream values into file as measurement goes on
+            with open(filename, 'a') as f:
+                f.write(','.join(vals))
 
             # A pause between reads
             time.sleep(sleep_time)
 
-        return np.array(output)
-
     except KeyboardInterrupt:
         # End measurements
-        return np.array(output)
+        pass
 
 class RS232:
     """RS232 serial SCPI communication object."""
