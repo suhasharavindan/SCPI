@@ -95,7 +95,7 @@ def read_instruments(filename, conf, instruments, sleep_time=0, meas_time=10000,
             # Stream values into file as measurement goes on
             if filename: # Skip write to file if no filename provided
                 with open(filename, 'a') as f:
-                    f.write(','.join([str(val) for val in vals]))
+                    f.write(','.join([str(val) for val in vals]) + '\n')
 
             # A pause between reads
             time.sleep(sleep_time)
