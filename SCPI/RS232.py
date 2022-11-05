@@ -42,7 +42,7 @@ def init_instruments(instrument_type):
 
     return instruments
 
-def read_instruments(filename, conf, instruments, sleep_time=0, meas_time=10000, val_range=1, val_res=1e-6, channels=None):
+def read_instruments(filename, conf, instruments, sleep_time=0, meas_time=10000, val_range='DEF', val_res='MAX', channels=None):
     """Take specified measurement from multiple DMMs at every period for a set amount of time.
 
     Args:
@@ -51,8 +51,8 @@ def read_instruments(filename, conf, instruments, sleep_time=0, meas_time=10000,
         instruments (list): Instrument objects.
         sleepTime (float, optional): Sleep time between measurements in sec. Defaults to 0.
         meas_time (int, optional): Total measurement time in sec. Defaults to 10000.
-        val_range (int or list, optional): Approximate measurement range in standard units. Defaults to 1.
-        val_res (float, optional): Measurement resolution in standard units. Defaults to 1e-6.
+        val_range (int, str or list, optional): Approximate measurement range in standard units. Defaults to "DEF".
+        val_res (float or str, optional): Measurement resolution in standard units. Defaults to "MAX".
         channels (list int, optional): Instrument channels to address. Only applicable to MX. Defaults to None.
 
     Returns:
