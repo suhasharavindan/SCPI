@@ -93,8 +93,9 @@ def read_instruments(filename, conf, instruments, sleep_time=0, meas_time=10000,
             print(*vals, sep='\t')
 
             # Stream values into file as measurement goes on
-            with open(filename, 'a') as f:
-                f.write(','.join(vals))
+            if filename: # Skip write to file if no filename provided
+                with open(filename, 'a') as f:
+                    f.write(','.join([str(val) for val in vals]))
 
             # A pause between reads
             time.sleep(sleep_time)
