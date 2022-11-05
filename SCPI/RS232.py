@@ -42,7 +42,7 @@ def init_instruments(instrument_type):
 
     return instruments
 
-def read_instruments(filename, conf, instruments, sleep_time=0, meas_time=10000, val_range='DEF', val_res='MAX', channels=None):
+def read_instruments(filename, conf, instruments, sleep_time=0, meas_time=10000, val_range='DEF', val_res='MIN', channels=None):
     """Take specified measurement from multiple DMMs at every period for a set amount of time.
 
     Args:
@@ -52,7 +52,7 @@ def read_instruments(filename, conf, instruments, sleep_time=0, meas_time=10000,
         sleepTime (float, optional): Sleep time between measurements in sec. Defaults to 0.
         meas_time (int, optional): Total measurement time in sec. Defaults to 10000.
         val_range (int, str or list, optional): Approximate measurement range in standard units. Defaults to "DEF".
-        val_res (float or str, optional): Measurement resolution in standard units. Defaults to "MAX".
+        val_res (float or str, optional): Measurement resolution in standard units. Defaults to "MIN".
         channels (list int, optional): Instrument channels to address. Only applicable to MX. Defaults to None.
 
     Returns:
@@ -207,13 +207,13 @@ class DMM34401A(RS232):
         """
         super().__init__(port_num, baudrate, parity, stopbits, bytesize, xonxoff)
 
-    def set_CONF(self, conf, val_range, val_res, _=None):
+    def set_CONF(self, conf, val_range='DEF', val_res='MIN', _=None):
         """Set DMM to measurement mode.
 
         Args:
             conf (str): Measurement mode.
-            val_range (int): Approximate range of measurement in standard units.
-            val_res (float): Measurement resolution in standard units.
+            val_range (int, str or list): Approximate range of measurement in standard units. Defaults to "DEF".
+            val_res (float or str): Measurement resolution in standard units. Defaults to "MIN".
             _ : Placeholder to match arguments for MX objects.
         """
         params = f"{val_range}, {val_res}"
@@ -235,14 +235,14 @@ class MX34970A(RS232):
         """
         super().__init__(port_num, baudrate, parity, stopbits, bytesize, xonxoff)
 
-    def set_CONF(self, conf, val_range, val_res, channels):
+    def set_CONF(self, conf, channels, val_range='DEF', val_res='MIN'):
         """Set MX to measurement mode.
 
         Args:
             conf (str): Measurement mode.
             channels (list int): Channel indices.
-            val_range (int or list): Approximate range of measurement in standard units.
-            val_res (float): Measurement resolution in standard units.
+            val_range (int, str or list): Approximate range of measurement in standard units. Defaults to "DEF".
+            val_res (float or str): Measurement resolution in standard units. Defaults to "MIN".
         """
 
         if isinstance(val_range, list):
