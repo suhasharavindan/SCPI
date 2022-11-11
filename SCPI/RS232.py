@@ -49,7 +49,7 @@ def read_instruments(filename, conf, instruments, sleep_time=0, meas_time=10000,
         filename (str): Output file name.
         conf (str, list): Measurement mode. Look at set_CONF function for options.
         instruments (list): Instrument objects.
-        sleepTime (float, optional): Sleep time between measurements in sec. Defaults to 0.
+        sleep_time (float, optional): Sleep time between measurements in sec. Defaults to 0.
         meas_time (int, optional): Total measurement time in sec. Defaults to 10000.
         val_range (int, str or list, optional): Approximate measurement range in standard units. Defaults to "DEF".
         val_res (float or str, optional): Measurement resolution in standard units. Defaults to "MIN".
@@ -64,12 +64,11 @@ def read_instruments(filename, conf, instruments, sleep_time=0, meas_time=10000,
 
     # Set measurement mode on instruments
     # If a different conf is needed per instrument, a list should be passed in the same order of the DMMs
-    if isinstance(conf, list):
-        for idx, ins in enumerate(instruments):
-            ins.set_CONF(conf[idx], val_range, val_res, channels)
-    else:
-        for ins in instruments:
-            ins.set_CONF(conf, val_range, val_res, channels)
+    if not isinstance(conf, list):
+        conf = [conf] * len(instruments)
+    for idx, ins in enumerate(instruments):
+        ins.set_CONF(conf[idx], val_range, val_res, channels)
+        time.sleep(5)
 
     time.sleep(10)
 
