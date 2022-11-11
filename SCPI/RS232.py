@@ -183,6 +183,7 @@ class RS232:
         """
         try:
             self.ser.write("READ?\n".encode())
+            time.sleep(5)
             temp = self.ser.readline()
             output = float(temp.decode()[:-2])
         except ValueError:
